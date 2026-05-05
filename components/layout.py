@@ -1,0 +1,12 @@
+"""Constantes de espaçamento e densidade visual da interface."""
+
+PAGE_PADX = 16
+PAGE_TOP_PADY = 12
+PAGE_BOTTOM_PADY = 16
+SECTION_GAP = 10
+SUBSECTION_GAP = 6
+DETAIL_PADX = 12
+DETAIL_PADY = 12
+TABLE_INNER_PADX = 8
+TABLE_INNER_PADY = 4
+SIDEBAR_WIDTH = 200

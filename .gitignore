@@ -1,0 +1,22 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ambiente virtual
+.venv/
+venv/
+env/
+
+# Banco local e artefatos SQLite
+mecanica.db
+mecanica.db-wal
+mecanica.db-shm
+*.db
+*.db-wal
+*.db-shm
+
+# Logs e caches
+*.log
+.pytest_cache/
+.mypy_cache/
