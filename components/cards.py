@@ -162,3 +162,70 @@ class ConfirmDialog(ctk.CTkToplevel):
             fg_color="#ea4335", hover_color="#c62828",
             command=lambda: (on_confirm() if on_confirm else None, self.destroy()),
         ).pack(side="left", padx=10)
+
+
+class CTkMessagebox(ctk.CTkToplevel):
+    """Mensagem modal simples no estilo CustomTkinter."""
+
+    def __init__(
+        self,
+        master,
+        title: str = "Mensagem",
+        message: str = "",
+        icon: str = "info",
+        option_1: str = "OK",
+    ) -> None:
+        super().__init__(master)
+
+        self.title(title)
+        self.resizable(False, False)
+        self.geometry("460x220")
+        self.transient(master.winfo_toplevel())
+        self.grab_set()
+
+        palette = {
+            "info": ("#2563EB", "ℹ"),
+            "cancel": ("#DC2626", "✕"),
+            "warning": ("#D97706", "⚠"),
+            "check": ("#16A34A", "✓"),
+        }
+        accent_color, icon_char = palette.get(icon, palette["info"])
+
+        container = ctk.CTkFrame(self, corner_radius=16)
+        container.pack(fill="both", expand=True, padx=18, pady=18)
+
+        topo = ctk.CTkFrame(container, fg_color="transparent")
+        topo.pack(fill="x", padx=18, pady=(18, 8))
+
+        ctk.CTkLabel(
+            topo,
+            text=icon_char,
+            font=ctk.CTkFont(size=28, weight="bold"),
+            text_color=accent_color,
+        ).pack(side="left", padx=(0, 12))
+
+        ctk.CTkLabel(
+            topo,
+            text=title,
+            font=ctk.CTkFont(size=18, weight="bold"),
+            anchor="w",
+        ).pack(side="left", fill="x", expand=True)
+
+        ctk.CTkLabel(
+            container,
+            text=message,
+            font=ctk.CTkFont(size=13),
+            justify="left",
+            wraplength=400,
+        ).pack(fill="x", padx=18, pady=(0, 18), anchor="w")
+
+        ctk.CTkButton(
+            container,
+            text=option_1,
+            fg_color=accent_color,
+            hover_color=accent_color,
+            command=self.destroy,
+            width=120,
+        ).pack(anchor="e", padx=18, pady=(0, 18))
+
+        self.protocol("WM_DELETE_WINDOW", self.destroy)

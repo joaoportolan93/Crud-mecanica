@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from constants import APP_NAME, APP_VERSION, APP_LOG_FILE, get_asset_path
 from database import Database
 from app_context import Repos
-from updater import verificar_atualizacao
+from updater import UpdateStatus, obter_estado_atualizacao
 from components.sidebar import Sidebar
 from views import (
     DashboardView, ClientesView, VeiculosView, EstoqueView,
@@ -46,6 +46,11 @@ class App(ctk.CTk):
 
     def __init__(self, db: Database) -> None:
         super().__init__()
+        self.update_status: UpdateStatus = {
+            "estado": "verificando",
+            "versao_nova": None,
+            "url_download": None,
+        }
         self.title(f"{APP_NAME} — {APP_VERSION}")
         self.geometry("1100x700")
         self.minsize(900, 550)
@@ -113,17 +118,29 @@ class App(ctk.CTk):
         self.nova_nota_view.carregar_nota(nota_id=nota_id, cliente_id=cliente_id)
 
     def _check_update(self) -> None:
-        resultado = verificar_atualizacao()
-        if resultado["tem_atualizacao"]:
-            self.after(0, lambda: self._mostrar_update(resultado))
+        status = obter_estado_atualizacao()
+        try:
+            self.after(0, lambda estado=status: self._aplicar_update_status(estado))
+        except Exception:
+            pass
 
-    def _mostrar_update(self, resultado: dict) -> None:
+    def _aplicar_update_status(self, status: UpdateStatus) -> None:
+        """Atualiza o cache do estado de atualização e reflete na UI."""
+        self.update_status = status
+
+        config_view = self.views.get("configuracoes")
+        if config_view and hasattr(config_view, "render_update_section"):
+            config_view.render_update_section()
+
+        if status["estado"] != "disponivel":
+            return
+
         dashboard = self.views.get("dashboard")
         if dashboard and hasattr(dashboard, "mostrar_banner"):
             dashboard.mostrar_banner(
-                f"Nova versão disponível: {resultado['versao_nova']}",
+                f"Nova versão disponível: {status['versao_nova']}",
                 action_text="Ver atualização",
-                action_cb=lambda: webbrowser.open(resultado["url_download"]),
+                action_cb=lambda: webbrowser.open(status["url_download"] or ""),
             )
 
     def _on_close(self) -> None:
