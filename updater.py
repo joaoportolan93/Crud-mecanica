@@ -7,7 +7,8 @@ from typing import TypedDict
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-APP_VERSION: str = "v1.0.0"
+from constants import APP_VERSION
+
 GITHUB_USER: str = "joaoportolan93"
 GITHUB_REPO: str = "Crud-mecanica"
 

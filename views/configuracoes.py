@@ -2,7 +2,8 @@
 
 import webbrowser
 import customtkinter as ctk
-from updater import APP_VERSION, verificar_atualizacao
+from constants import APP_VERSION
+from updater import verificar_atualizacao
 from components.cards import NotificationBanner
 from components.layout import PAGE_PADX, PAGE_TOP_PADY, SECTION_GAP
 

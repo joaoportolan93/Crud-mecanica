@@ -15,16 +15,25 @@ import customtkinter as ctk
 
 sys.path.insert(0, os.path.dirname(__file__))
 
+from constants import APP_NAME, APP_VERSION, APP_LOG_FILE, get_asset_path
 from database import Database
 from app_context import Repos
-from updater import verificar_atualizacao, APP_VERSION
+from updater import verificar_atualizacao
 from components.sidebar import Sidebar
 from views import (
     DashboardView, ClientesView, VeiculosView, EstoqueView,
     ServicosView, NotasServicoView, NovaNotaView, ConfiguracoesView,
 )
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+APP_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    handlers=[
+        logging.FileHandler(APP_LOG_FILE, encoding="utf-8"),
+        logging.StreamHandler(),
+    ],
+)
 logger = logging.getLogger(__name__)
 
 # Tema: segue o SO (dark/light)
@@ -37,9 +46,16 @@ class App(ctk.CTk):
 
     def __init__(self, db: Database) -> None:
         super().__init__()
-        self.title(f"Gestão de Mecânica — {APP_VERSION}")
+        self.title(f"{APP_NAME} — {APP_VERSION}")
         self.geometry("1100x700")
         self.minsize(900, 550)
+
+        icon_path = get_asset_path("icon.ico")
+        if sys.platform.startswith("win") and icon_path.exists():
+            try:
+                self.iconbitmap(default=str(icon_path))
+            except Exception:
+                pass
 
         self.repos = Repos.from_database(db)
         self._db = db

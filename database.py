@@ -17,6 +17,8 @@ import sqlite3
 import logging
 from pathlib import Path
 
+from constants import DB_PATH, get_asset_path
+
 logger = logging.getLogger(__name__)
 
 
@@ -151,9 +153,7 @@ class Database:
     def __init__(self, db_path: str | None = None) -> None:
         if self._initialized:
             return
-        self._db_path = db_path or str(
-            Path(__file__).parent / "mecanica.db"
-        )
+        self._db_path = Path(db_path) if db_path else DB_PATH
         self._connection: sqlite3.Connection | None = None
         self._initialized = True
 
@@ -161,7 +161,8 @@ class Database:
     def connection(self) -> sqlite3.Connection:
         """Retorna a conexão ativa, criando-a se necessário."""
         if self._connection is None:
-            self._connection = sqlite3.connect(self._db_path)
+            self._db_path.parent.mkdir(parents=True, exist_ok=True)
+            self._connection = sqlite3.connect(str(self._db_path))
             self._connection.row_factory = sqlite3.Row
             self._connection.execute("PRAGMA foreign_keys = ON")
             self._connection.execute("PRAGMA journal_mode = WAL")
@@ -186,7 +187,7 @@ class Database:
         Seguro para chamar em toda inicialização do app.
         """
         if not self._is_initialized():
-            schema_path = Path(__file__).parent / "schema_mecanica.sql"
+            schema_path = get_asset_path("schema_mecanica.sql")
             if not schema_path.exists():
                 raise FileNotFoundError(
                     f"Arquivo de schema não encontrado: {schema_path}"

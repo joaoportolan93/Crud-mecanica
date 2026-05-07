@@ -2,6 +2,7 @@
 
 import customtkinter as ctk
 
+from constants import APP_VERSION
 from components.layout import SIDEBAR_WIDTH
 
 
@@ -62,7 +63,6 @@ class Sidebar(ctk.CTkFrame):
 
         # Espaçador + versão no rodapé
         ctk.CTkLabel(self, text="").pack(expand=True)
-        from updater import APP_VERSION
         ctk.CTkLabel(
             self, text=f"v{APP_VERSION.lstrip('v')}",
             text_color="gray50",

@@ -20,3 +20,9 @@ mecanica.db-shm
 *.log
 .pytest_cache/
 .mypy_cache/
+
+# Artefatos de empacotamento/distribuição
+build/
+dist/
+output/
+_install_test/
