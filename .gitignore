@@ -26,3 +26,6 @@ build/
 dist/
 output/
 _install_test/
+installer_output/
+*.spec
+*.exe

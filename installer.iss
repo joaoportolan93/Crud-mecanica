@@ -1,72 +1,60 @@
 ; -----------------------------------------------------------------------------
-; Inno Setup 6 - Instalador do Gestão de Mecânica
+; Instalador Inno Setup 6 do Gestão de Mecânica
 ; -----------------------------------------------------------------------------
 
-#define AppName "Gestão de Mecânica"
-#define AppVersion "1.0.0"
-#define AppPublisher "joaoportolan93"
-#define AppExeName "Gestão de Mecânica.exe"
-#define AppId "GestaoDeMecanica"
-#define AppSourceDir "dist\Gestão de Mecânica"
-#define AppIconPath "assets\icon.ico"
+#define MyAppName "Gestão de Mecânica"
+#define MyAppVersion "1.0.0"
+#define MyAppExeName "Gestão de Mecânica.exe"
+#define MyAppPublisher "João Portolan"
+#define MySourceDir "dist\Gestão de Mecânica"
 
 [Setup]
-AppId={#AppId}
-AppName={#AppName}
-AppVersion={#AppVersion}
-AppVerName={#AppName} {#AppVersion}
-AppPublisher={#AppPublisher}
+; Metadados principais do instalador e comportamento padrão de instalação.
+AppId={{5D9C7B5E-0A06-4A2D-8D0D-7B2AA8C0F4B6}}
+AppName={#MyAppName}
+AppVersion={#MyAppVersion}
+AppVerName={#MyAppName} {#MyAppVersion}
+AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\GestaoDeMecanica
-DefaultGroupName={#AppName}
+DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=no
 PrivilegesRequired=lowest
-OutputDir=output
-OutputBaseFilename=Setup_{#AppName}_{#AppVersion}
+OutputDir=installer_output
+OutputBaseFilename=Setup_GestaoDeMecanica_v{#MyAppVersion}
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
-UninstallDisplayIcon={app}\{#AppExeName}
+UninstallDisplayIcon={app}\{#MyAppExeName}
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 
-#if FileExists(AppIconPath)
-SetupIconFile={#AppIconPath}
+; Ícone do instalador: usa o arquivo da pasta assets apenas se ele existir.
+#if FileExists("assets\icon.ico")
+SetupIconFile=assets\icon.ico
 #endif
 
 [Languages]
+; Idioma principal do assistente de instalação.
 Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
 
 [Tasks]
+; Tarefa opcional para criar atalho na área de trabalho, já marcada por padrão.
 Name: "desktopicon"; Description: "Criar atalho na Área de Trabalho"; GroupDescription: "Atalhos adicionais:"; Flags: checkedonce
 
 [Files]
-Source: "{#AppSourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Copia tudo que o PyInstaller gerou no modo onedir, incluindo a pasta _internal.
+Source: "{#MySourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
-Name: "{commondesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desktopicon
+; Atalhos do menu Iniciar e da Área de Trabalho apontando para o executável instalado.
+Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#AppExeName}"; Description: "Abrir o programa ao final"; Flags: nowait postinstall skipifsilent
+; Ao final da instalação, oferece abrir o programa imediatamente.
+Filename: "{app}\{#MyAppExeName}"; Description: "Abrir {#MyAppName} agora"; Flags: nowait postinstall skipifsilent
 
 [UninstallDelete]
-; Não remover AppData: o banco do cliente fica em %LOCALAPPDATA%\GestaoDeMecanica\mecanica.db.
-; A desinstalação deve apagar apenas os binários do app, preservando os dados do usuário.
+; O banco fica em %LOCALAPPDATA%\GestaoDeMecanica\mecanica.db e não deve ser apagado.
+; A desinstalação remove apenas os arquivos instalados em Program Files.
 
-[Code]
-function InitializeSetup(): Boolean;
-var
-  InstalledVersion: string;
-begin
-  Result := True;
-  if RegQueryStringValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\' + ExpandConstant('{#AppId}') + '_is1', 'DisplayVersion', InstalledVersion)
-     or RegQueryStringValue(HKLM, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\' + ExpandConstant('{#AppId}') + '_is1', 'DisplayVersion', InstalledVersion) then
-  begin
-    MsgBox(
-      'Já existe uma versão instalada do Gestão de Mecânica (' + InstalledVersion + ').'#13#10 +
-      'O instalador vai atualizar os arquivos do programa e manter o banco de dados do cliente.',
-      mbInformation,
-      MB_OK
-    );
-  end;
-end;

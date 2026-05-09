@@ -30,7 +30,7 @@ DIST_DIR = ROOT / "dist"
 BUNDLE_DIR = DIST_DIR / APP_NAME
 SPEC_FILE = ROOT / "mecanica.spec"
 INSTALLER_SPEC = ROOT / "installer.iss"
-OUTPUT_DIR = ROOT / "output"
+OUTPUT_DIR = ROOT / "installer_output"
 
 
 def _print(msg: str) -> None:
