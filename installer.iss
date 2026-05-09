@@ -3,7 +3,7 @@
 ; -----------------------------------------------------------------------------
 
 #define MyAppName "Gestão de Mecânica"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppExeName "Gestão de Mecânica.exe"
 #define MyAppPublisher "João Portolan"
 #define MySourceDir "dist\Gestão de Mecânica"
@@ -25,12 +25,14 @@ Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
 UninstallDisplayIcon={app}\{#MyAppExeName}
+#if FileExists("assets\icon.ico")
+SetupIconFile=assets\icon.ico
+#endif
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 
 ; Ícone do instalador: usa o arquivo da pasta assets apenas se ele existir.
 #if FileExists("assets\icon.ico")
-SetupIconFile=assets\icon.ico
 #endif
 
 [Languages]
