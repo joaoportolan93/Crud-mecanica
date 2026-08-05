@@ -587,12 +587,29 @@ class NovaNotaView(ctk.CTkFrame):
             "TitleOS",
             parent=styles["Title"],
             fontName="Helvetica-Bold",
-            fontSize=18,
-            leading=22,
+            fontSize=22,
+            leading=26,
             textColor=colors.HexColor("#1a73e8"),
-            spaceAfter=8,
+            alignment=0,
+            spaceAfter=6,
         )
-        small = ParagraphStyle("SmallOS", parent=styles["BodyText"], fontSize=9, leading=11)
+        small = ParagraphStyle("SmallOS", parent=styles["BodyText"], fontSize=10.5, leading=13)
+        section_style = ParagraphStyle(
+            "SectionOS",
+            parent=styles["Heading2"],
+            fontName="Helvetica-Bold",
+            fontSize=15,
+            leading=18,
+            textColor=colors.HexColor("#202124"),
+            spaceAfter=4,
+        )
+        table_cell_style = ParagraphStyle(
+            "TableCell",
+            parent=styles["Normal"],
+            fontName="Helvetica",
+            fontSize=10,
+            leading=13,
+        )
 
         story = []
         oficina_nome = oficina.get("nome", "Mecânica") or "Mecânica"
@@ -609,28 +626,31 @@ class NovaNotaView(ctk.CTkFrame):
             story.append(Paragraph("<br/>".join(oficina_linhas), small))
         story.append(Spacer(1, 6 * mm))
 
-        story.append(Paragraph(f"OS #{nota['numero']} - {nota['status']}", styles["Heading2"]))
-        story.append(Spacer(1, 2 * mm))
+        story.append(Paragraph(f"OS #{nota['numero']} - {nota['status']}", section_style))
+        story.append(Spacer(1, 3 * mm))
 
         dados_os = [
-            ["Cliente", cliente["nome"] if cliente else "—"],
-            ["CPF/CNPJ", cliente["cpf_cnpj"] if cliente and "cpf_cnpj" in cliente.keys() and cliente["cpf_cnpj"] else "—"],
-            ["Telefone", cliente["telefone"] if cliente and "telefone" in cliente.keys() and cliente["telefone"] else "—"],
-            ["Veículo", f"{veiculo['placa'] or '—'} - {veiculo['modelo']}" if veiculo else "—"],
-            ["Km Entrada", str(nota["km_entrada"]) if nota["km_entrada"] else "—"],
-            ["Abertura", nota["data_abertura"][:19] if nota["data_abertura"] else "—"],
-            ["Conclusão", nota["data_conclusao"][:19] if nota["data_conclusao"] else "—"],
-            ["Forma de Pagamento", nota["forma_pagamento"] or "—"],
+            ["Cliente", Paragraph(cliente["nome"] if cliente else "—", table_cell_style)],
+            ["CPF/CNPJ", Paragraph(cliente["cpf_cnpj"] if cliente and "cpf_cnpj" in cliente.keys() and cliente["cpf_cnpj"] else "—", table_cell_style)],
+            ["Telefone", Paragraph(cliente["telefone"] if cliente and "telefone" in cliente.keys() and cliente["telefone"] else "—", table_cell_style)],
+            ["Veículo", Paragraph(f"{veiculo['placa'] or '—'} - {veiculo['modelo']}" if veiculo else "—", table_cell_style)],
+            ["Km Entrada", Paragraph(str(nota["km_entrada"]) if nota["km_entrada"] else "—", table_cell_style)],
+            ["Abertura", Paragraph(nota["data_abertura"][:19] if nota["data_abertura"] else "—", table_cell_style)],
+            ["Conclusão", Paragraph(nota["data_conclusao"][:19] if nota["data_conclusao"] else "—", table_cell_style)],
+            ["Forma de Pagamento", Paragraph(nota["forma_pagamento"] or "—", table_cell_style)],
         ]
-        t_os = Table(dados_os, colWidths=[40 * mm, 125 * mm])
+        t_os = Table(dados_os, colWidths=[46 * mm, 140 * mm])
         t_os.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (0, -1), colors.whitesmoke),
+            ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#f8f9fa")),
             ("FONTNAME", (0, 0), (0, -1), "Helvetica-Bold"),
-            ("FONTNAME", (1, 0), (1, -1), "Helvetica"),
-            ("FONTSIZE", (0, 0), (-1, -1), 9),
+            ("FONTSIZE", (0, 0), (-1, -1), 10.5),
             ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#d0d0d0")),
-            ("VALIGN", (0, 0), (-1, -1), "TOP"),
-            ("LEADING", (0, 0), (-1, -1), 11),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("TOPPADDING", (0, 0), (-1, -1), 5),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+            ("LEADING", (0, 0), (-1, -1), 14),
         ]))
         story.append(t_os)
         story.append(Spacer(1, 6 * mm))
@@ -639,7 +659,7 @@ class NovaNotaView(ctk.CTkFrame):
         for p in det["pecas"]:
             itens.append([
                 "Peça",
-                p["descricao"],
+                Paragraph(p["descricao"], table_cell_style),
                 str(p["quantidade"]),
                 dinheiro(float(p["valor_unitario"])),
                 dinheiro(float(p["valor_total"])),
@@ -647,24 +667,29 @@ class NovaNotaView(ctk.CTkFrame):
         for s in det["servicos"]:
             itens.append([
                 "Serviço",
-                s["descricao"],
+                Paragraph(s["descricao"], table_cell_style),
                 str(s["quantidade"]),
                 dinheiro(float(s["valor_unitario"])),
                 dinheiro(float(s["valor_total"])),
             ])
 
-        t_itens = Table(itens, colWidths=[22 * mm, 78 * mm, 18 * mm, 28 * mm, 28 * mm], repeatRows=1)
+        t_itens = Table(itens, colWidths=[24 * mm, 82 * mm, 18 * mm, 31 * mm, 31 * mm], repeatRows=1)
         t_itens.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1a73e8")),
             ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
             ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-            ("FONTSIZE", (0, 0), (-1, -1), 8.5),
+            ("FONTSIZE", (0, 0), (-1, 0), 10.5),
+            ("FONTSIZE", (0, 1), (-1, -1), 10),
             ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#d0d0d0")),
-            ("VALIGN", (0, 0), (-1, -1), "TOP"),
-            ("ALIGN", (2, 1), (-1, -1), "RIGHT"),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("ALIGN", (2, 0), (-1, -1), "RIGHT"),
+            ("TOPPADDING", (0, 0), (-1, -1), 6),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
         ]))
         story.append(t_itens)
-        story.append(Spacer(1, 5 * mm))
+        story.append(Spacer(1, 6 * mm))
 
         resumo = [
             ["Subtotal Peças", dinheiro(float(nota["subtotal_pecas"] or 0))],
@@ -672,37 +697,48 @@ class NovaNotaView(ctk.CTkFrame):
             ["Desconto", dinheiro(float(nota["desconto"] or 0))],
             ["TOTAL", dinheiro(float(nota["valor_total"] or 0))],
         ]
-        t_resumo = Table(resumo, colWidths=[50 * mm, 30 * mm], hAlign="RIGHT")
+        t_resumo = Table(resumo, colWidths=[60 * mm, 40 * mm], hAlign="RIGHT")
         t_resumo.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -2), colors.whitesmoke),
+            ("BACKGROUND", (0, 0), (-1, -2), colors.HexColor("#f8f9fa")),
             ("BACKGROUND", (0, -1), (-1, -1), colors.HexColor("#e8f0fe")),
             ("FONTNAME", (0, 0), (-1, -2), "Helvetica"),
             ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
+            ("FONTSIZE", (0, 0), (-1, -2), 10.5),
+            ("FONTSIZE", (0, -1), (-1, -1), 12),
+            ("TEXTCOLOR", (0, -1), (-1, -1), colors.HexColor("#1a73e8")),
             ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#d0d0d0")),
             ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+            ("TOPPADDING", (0, 0), (-1, -1), 6),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
         ]))
         story.append(t_resumo)
+
         if nota["observacoes"]:
-            story.append(Spacer(1, 5 * mm))
-            story.append(Paragraph("Observações", styles["Heading3"]))
-            story.append(Paragraph(nota["observacoes"], styles["BodyText"]))
+            story.append(Spacer(1, 6 * mm))
+            obs_title_style = ParagraphStyle("ObsTitle", parent=styles["Heading3"], fontName="Helvetica-Bold", fontSize=12, leading=15)
+            obs_body_style = ParagraphStyle("ObsBody", parent=styles["BodyText"], fontName="Helvetica", fontSize=10.5, leading=14)
+            story.append(Paragraph("Observações", obs_title_style))
+            story.append(Spacer(1, 2 * mm))
+            story.append(Paragraph(nota["observacoes"], obs_body_style))
 
         doc = SimpleDocTemplate(
             caminho,
             pagesize=A4,
-            rightMargin=15 * mm,
-            leftMargin=15 * mm,
-            topMargin=15 * mm,
-            bottomMargin=15 * mm,
+            rightMargin=12 * mm,
+            leftMargin=12 * mm,
+            topMargin=12 * mm,
+            bottomMargin=12 * mm,
             title=f"OS {nota['numero']}",
             author=oficina_nome,
         )
 
         def _cabecalho_rodape(canvas, _doc) -> None:
             canvas.saveState()
-            canvas.setFont("Helvetica", 8)
+            canvas.setFont("Helvetica", 9)
             canvas.setFillColor(colors.grey)
-            canvas.drawRightString(195 * mm, 10 * mm, f"Gerado em {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+            canvas.drawRightString(198 * mm, 8 * mm, f"Gerado em {datetime.now().strftime('%d/%m/%Y %H:%M')}")
             canvas.restoreState()
 
         try:

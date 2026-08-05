@@ -8,6 +8,11 @@ __pycache__/
 venv/
 env/
 
+# Configurações de ambiente
+.env
+.env.*
+
+
 # Banco local e artefatos SQLite
 mecanica.db
 mecanica.db-wal
