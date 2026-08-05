@@ -3,7 +3,7 @@
 ; -----------------------------------------------------------------------------
 
 #define MyAppName "Gestão de Mecânica"
-#define MyAppVersion "1.0.2"
+#define MyAppVersion "1.0.3"
 #define MyAppExeName "Gestão de Mecânica.exe"
 #define MyAppPublisher "João Portolan"
 #define MySourceDir "dist\Gestão de Mecânica"

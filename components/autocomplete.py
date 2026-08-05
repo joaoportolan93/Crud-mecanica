@@ -94,7 +94,8 @@ class AutocompleteEntry(ctk.CTkFrame):
         self._dropdown.geometry(f"{w}x{max_h}+{x}+{y}")
 
         scroll = ctk.CTkScrollableFrame(
-            self._dropdown, fg_color=("gray95", "gray20"),
+            self._dropdown, fg_color=("white", "gray20"),
+            border_width=1, border_color=("gray75", "gray30"),
         )
         scroll.pack(fill="both", expand=True)
 
@@ -114,7 +115,7 @@ class AutocompleteEntry(ctk.CTkFrame):
                 height=28,
                 fg_color="transparent",
                 text_color=("gray10", "gray90"),
-                hover_color=("gray80", "gray30"),
+                hover_color=("gray85", "gray30"),
                 font=ctk.CTkFont(size=13),
                 command=lambda i=item, d=display: self._select(i, d),
             )

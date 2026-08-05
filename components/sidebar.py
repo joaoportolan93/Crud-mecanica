@@ -55,7 +55,7 @@ class Sidebar(ctk.CTkFrame):
                 command=lambda k=key: self._navigate(k),
                 fg_color="transparent",
                 text_color=("gray10", "gray90"),
-                hover_color=("gray75", "gray28"),
+                hover_color=("gray88", "gray28"),
                 font=ctk.CTkFont(size=14),
             )
             btn.pack(fill="x", padx=8, pady=2)
@@ -80,7 +80,7 @@ class Sidebar(ctk.CTkFrame):
         for k, btn in self.buttons.items():
             if k == key:
                 btn.configure(
-                    fg_color=("gray75", "gray25"),
+                    fg_color=("gray85", "gray25"),
                     text_color=("gray10", "gray90"),
                 )
             else:

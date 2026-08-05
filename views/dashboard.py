@@ -16,15 +16,37 @@ class DashboardView(ctk.CTkFrame):
         self._banner_frame = ctk.CTkFrame(self, fg_color="transparent", height=0)
         self._banner_frame.pack(fill="x")
 
-        # Título
+        # Cabeçalho do Dashboard com botão de alternar tema
+        header = ctk.CTkFrame(self, fg_color="transparent")
+        header.pack(fill="x", padx=PAGE_PADX, pady=(PAGE_TOP_PADY, SECTION_GAP))
+        header.grid_columnconfigure(0, weight=1)
+
+        titles = ctk.CTkFrame(header, fg_color="transparent")
+        titles.grid(row=0, column=0, sticky="w")
+
         ctk.CTkLabel(
-            self, text="Dashboard",
+            titles, text="Dashboard",
             font=ctk.CTkFont(size=24, weight="bold"),
-        ).pack(anchor="w", padx=PAGE_PADX, pady=(PAGE_TOP_PADY, 4))
+        ).pack(anchor="w")
         ctk.CTkLabel(
-            self, text="Visão geral da oficina",
+            titles, text="Visão geral da oficina",
             font=ctk.CTkFont(size=13), text_color="gray50",
-        ).pack(anchor="w", padx=PAGE_PADX, pady=(0, SECTION_GAP))
+        ).pack(anchor="w", pady=(2, 0))
+
+        self._btn_theme = ctk.CTkButton(
+            header,
+            text="☀️ Modo Claro",
+            width=135,
+            height=36,
+            corner_radius=8,
+            font=ctk.CTkFont(size=13, weight="bold"),
+            fg_color=("gray80", "gray25"),
+            text_color=("gray10", "gray90"),
+            hover_color=("gray70", "gray35"),
+            command=self._toggle_theme,
+        )
+        self._btn_theme.grid(row=0, column=1, sticky="e")
+        self._atualizar_botao_tema()
 
         # Cards de métricas
         cards_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -73,16 +95,18 @@ class DashboardView(ctk.CTkFrame):
         ctk.CTkButton(
             atalhos, text="📦  Entrada de Peça", height=45, width=200,
             font=ctk.CTkFont(size=14),
-            fg_color=("gray75", "gray30"),
-            hover_color=("gray65", "gray40"),
+            fg_color=("gray80", "gray30"),
+            text_color=("gray10", "gray90"),
+            hover_color=("gray70", "gray40"),
             command=lambda: self.app.show_view("estoque"),
         ).pack(side="left", padx=(0, 8))
 
         ctk.CTkButton(
             atalhos, text="👤  Novo Cliente", height=45, width=200,
             font=ctk.CTkFont(size=14),
-            fg_color=("gray75", "gray30"),
-            hover_color=("gray65", "gray40"),
+            fg_color=("gray80", "gray30"),
+            text_color=("gray10", "gray90"),
+            hover_color=("gray70", "gray40"),
             command=lambda: self.app.show_view("clientes"),
         ).pack(side="left")
 
@@ -150,7 +174,7 @@ class DashboardView(ctk.CTkFrame):
             for nota in ultimas:
                 cli = self.repos.clientes.buscar_por_id(nota["cliente_id"])
                 nome_cli = cli["nome"] if cli else "—"
-                row = ctk.CTkFrame(self._ultimas_frame, corner_radius=6)
+                row = ctk.CTkFrame(self._ultimas_frame, fg_color=("white", "gray18"), corner_radius=6)
                 row.pack(fill="x", pady=2, padx=2)
                 row.configure(cursor="hand2")
 
@@ -183,3 +207,22 @@ class DashboardView(ctk.CTkFrame):
 
         except Exception as e:
             print(f"Erro ao atualizar dashboard: {e}")
+
+        self._atualizar_botao_tema()
+
+    def _toggle_theme(self) -> None:
+        """Alterna entre os modos Claro e Escuro do aplicativo."""
+        current = ctk.get_appearance_mode().lower()
+        novo = "light" if current in ("dark", "system") else "dark"
+        ctk.set_appearance_mode(novo)
+        self._atualizar_botao_tema()
+
+    def _atualizar_botao_tema(self) -> None:
+        """Atualiza a mensagem e ícone do botão de tema conforme a aparência ativa."""
+        if not hasattr(self, "_btn_theme") or not self._btn_theme:
+            return
+        current = ctk.get_appearance_mode().lower()
+        if current == "dark":
+            self._btn_theme.configure(text="☀️ Modo Claro")
+        else:
+            self._btn_theme.configure(text="🌙 Modo Escuro")

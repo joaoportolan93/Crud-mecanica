@@ -15,9 +15,11 @@ Decisões de projeto (debatidas pelo painel de especialistas):
 
 import sqlite3
 import logging
+import shutil
+from datetime import datetime
 from pathlib import Path
 
-from constants import DB_PATH, get_asset_path
+from constants import DB_PATH, BACKUP_DIR, APP_VERSION, get_asset_path, get_legacy_db_paths
 
 logger = logging.getLogger(__name__)
 
@@ -138,6 +140,49 @@ def aplicar_migrations(conn: sqlite3.Connection) -> None:
 # DATABASE (Singleton)
 # ════════════════════════════════════════════════════════════
 
+def _migrar_banco_legado_se_necessario(destino: Path) -> None:
+    """Procura por um banco mecanica.db antigo em caminhos conhecidos se o atual não existir."""
+    if destino.exists() and destino.stat().st_size > 0:
+        return
+
+    for legacy_path in get_legacy_db_paths():
+        if legacy_path.resolve() == destino.resolve():
+            continue
+        if legacy_path.exists() and legacy_path.is_file() and legacy_path.stat().st_size > 0:
+            logger.info(f"Banco legado encontrado em '{legacy_path}'. Migrando para '{destino}'...")
+            try:
+                destino.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(legacy_path, destino)
+                logger.info("Migração do banco de dados concluída com sucesso.")
+                return
+            except Exception as e:
+                logger.error(f"Falha ao migrar banco legado de '{legacy_path}': {e}")
+
+
+def _fazer_backup_rotativo(db_path: Path) -> None:
+    """Cria uma cópia de segurança do banco de dados na pasta de backups."""
+    if not db_path.exists() or db_path.stat().st_size == 0:
+        return
+
+    try:
+        BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+        nome_backup = f"mecanica_{APP_VERSION.replace('.', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
+        caminho_backup = BACKUP_DIR / nome_backup
+        shutil.copy2(db_path, caminho_backup)
+        logger.info(f"Backup automático criado em '{caminho_backup}'.")
+
+        # Manter apenas os 5 backups mais recentes
+        backups = sorted(BACKUP_DIR.glob("mecanica_*.db"), key=lambda f: f.stat().st_mtime, reverse=True)
+        for backup_antigo in backups[5:]:
+            try:
+                backup_antigo.unlink()
+                logger.info(f"Backup antigo removido: '{backup_antigo.name}'.")
+            except Exception:
+                pass
+    except Exception as e:
+        logger.warning(f"Não foi possível criar o backup automático do banco: {e}")
+
+
 class Database:
     """Gerencia a conexão única com o banco SQLite."""
 
@@ -162,6 +207,7 @@ class Database:
         """Retorna a conexão ativa, criando-a se necessário."""
         if self._connection is None:
             self._db_path.parent.mkdir(parents=True, exist_ok=True)
+            _migrar_banco_legado_se_necessario(self._db_path)
             self._connection = sqlite3.connect(str(self._db_path))
             self._connection.row_factory = sqlite3.Row
             self._connection.execute("PRAGMA foreign_keys = ON")
@@ -182,10 +228,13 @@ class Database:
         """Cria todas as tabelas se o banco estiver vazio e aplica migrations.
 
         Fluxo:
-          1. Se banco novo → executa schema_mecanica.sql completo
-          2. Se banco existente → aplica migrations pendentes
+          1. Tenta migrar banco legado se necessário
+          2. Se banco novo → executa schema_mecanica.sql completo
+          3. Se banco existente → faz backup preventivo e aplica migrations pendentes
         Seguro para chamar em toda inicialização do app.
         """
+        _migrar_banco_legado_se_necessario(self._db_path)
+
         if not self._is_initialized():
             schema_path = get_asset_path("schema_mecanica.sql")
             if not schema_path.exists():
@@ -195,6 +244,9 @@ class Database:
             with open(schema_path, encoding="utf-8") as f:
                 self.connection.executescript(f.read())
             logger.info("Schema inicial criado com sucesso.")
+        else:
+            # Criar backup preventivo antes de aplicar migrations
+            _fazer_backup_rotativo(self._db_path)
 
         # Aplicar migrations pendentes (se houver)
         aplicar_migrations(self.connection)

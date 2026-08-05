@@ -161,6 +161,23 @@ def _iniciar_instalador_e_fechar(caminho_exe: Path) -> None:
     sys.exit(0)
 
 
+def _parse_version(v_str: str) -> tuple[int, ...]:
+    """Converte 'v1.0.3' ou '1.0.3' em tupla de inteiros (1, 0, 3) para comparação segura."""
+    limpo = v_str.strip().lstrip("vV")
+    partes = []
+    for part in limpo.split("."):
+        try:
+            partes.append(int(part))
+        except ValueError:
+            break
+    return tuple(partes)
+
+
+def _is_versao_maior(versao_remota: str, versao_local: str) -> bool:
+    """Verifica se a versão remota é estritamente maior que a versão local."""
+    return _parse_version(versao_remota) > _parse_version(versao_local)
+
+
 def verificar_atualizacao() -> ResultadoAtualizacao:
     """Verifica a última release do GitHub e compara com a versão atual."""
     try:
@@ -172,7 +189,7 @@ def verificar_atualizacao() -> ResultadoAtualizacao:
         if not tag_name:
             return _resultado_padrao()
 
-        if tag_name != APP_VERSION:
+        if _is_versao_maior(tag_name, APP_VERSION):
             return {
                 "tem_atualizacao": True,
                 "versao_nova": tag_name,
@@ -215,7 +232,7 @@ def obter_estado_atualizacao() -> UpdateStatus:
             "url_download": None,
         }
 
-    if tag_name != APP_VERSION:
+    if _is_versao_maior(tag_name, APP_VERSION):
         return {
             "estado": "disponivel",
             "versao_nova": tag_name,

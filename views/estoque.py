@@ -32,7 +32,7 @@ class EstoqueView(ctk.CTkFrame):
         header.pack(fill="x", padx=PAGE_PADX, pady=(PAGE_TOP_PADY, SECTION_GAP))
         ctk.CTkLabel(header, text="Estoque de Peças", font=ctk.CTkFont(size=24, weight="bold")).pack(side="left")
         ctk.CTkButton(header, text="+ Nova Peça", width=130, command=self._nova_peca).pack(side="right")
-        ctk.CTkButton(header, text="📦 Entrada", width=130, fg_color=("gray75", "gray30"), hover_color=("gray65", "gray40"),
+        ctk.CTkButton(header, text="📦 Entrada", width=130, fg_color=("gray80", "gray30"), text_color=("gray10", "gray90"), hover_color=("gray70", "gray40"),
             command=self._entrada_estoque).pack(side="right", padx=10)
 
         filtros = ctk.CTkFrame(self, fg_color="transparent")
@@ -204,7 +204,7 @@ class EstoqueView(ctk.CTkFrame):
         ctk.CTkButton(btns, text="✏️ Editar", width=100, command=lambda: self._editar_peca(p, detail)).pack(side="left", padx=5)
         ctk.CTkButton(btns, text="🗑️ Excluir", width=100, fg_color="#ea4335", hover_color="#c62828",
             command=lambda: ConfirmDialog(detail, "Excluir", "Tem certeza?",
-                on_confirm=lambda: (self.repos.pecas.deletar(p["id"]), detail.destroy(), self._carregar()))).pack(side="right")
+                on_confirm=lambda: (self.repos.pecas.deletar(p["id"]), detail.destroy(), self._carregar()))).pack(side="left", padx=5)
 
         # Movimentações
         ctk.CTkLabel(scroll, text="Histórico de Movimentações", font=ctk.CTkFont(size=16, weight="bold")).pack(anchor="w", pady=(12, 5))

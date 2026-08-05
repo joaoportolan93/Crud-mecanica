@@ -279,19 +279,19 @@ class ClientesView(ctk.CTkFrame):
         ).pack(side="left", padx=(0, 5))
         ctk.CTkButton(
             btns, text="🚗 Novo Veículo", width=130,
-            fg_color=("gray75", "gray30"), hover_color=("gray65", "gray40"),
+            fg_color=("gray80", "gray30"), text_color=("gray10", "gray90"), hover_color=("gray70", "gray40"),
             command=lambda: self._novo_veiculo(row["id"]),
         ).pack(side="left", padx=5)
         ctk.CTkButton(
             btns, text="📋 Nova OS", width=120,
-            fg_color=("gray75", "gray30"), hover_color=("gray65", "gray40"),
+            fg_color=("gray80", "gray30"), text_color=("gray10", "gray90"), hover_color=("gray70", "gray40"),
             command=lambda: (detail.destroy(), self.app.abrir_nova_nota(cliente_id=row["id"])),
         ).pack(side="left", padx=5)
         ctk.CTkButton(
             btns, text="🗑️ Excluir", width=100,
             fg_color="#ea4335", hover_color="#c62828",
             command=lambda: self._confirmar_exclusao(row["id"], detail),
-        ).pack(side="right")
+        ).pack(side="left", padx=5)
 
         # Veículos
         ctk.CTkLabel(scroll, text="Veículos", font=ctk.CTkFont(size=16, weight="bold")).pack(anchor="w", pady=(10, 5))
@@ -319,9 +319,9 @@ class ClientesView(ctk.CTkFrame):
                 nf.pack(fill="x", pady=2)
                 ctk.CTkLabel(nf, text=f"#{n['numero']}", font=ctk.CTkFont(weight="bold"), width=60).pack(side="left", padx=8, pady=6)
                 ctk.CTkLabel(nf, text=n["data_abertura"][:10] if n["data_abertura"] else "").pack(side="left", padx=5)
-                ctk.CTkLabel(nf, text=f"R$ {n['valor_total']:.2f}").pack(side="left", padx=5)
+                ctk.CTkLabel(nf, text=f"R$ {n['valor_total']:.2f}").pack(side="left", padx=15)
                 from components.cards import StatusBadge
-                StatusBadge(nf, n["status"]).pack(side="right", padx=8, pady=4)
+                StatusBadge(nf, n["status"]).pack(side="left", padx=15, pady=4)
         except Exception:
             pass
 

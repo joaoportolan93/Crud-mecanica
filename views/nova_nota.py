@@ -55,9 +55,9 @@ class NovaNotaView(ctk.CTkFrame):
         body.grid_columnconfigure(1, weight=6)
         body.grid_rowconfigure(0, weight=1)
 
-        left_col = ctk.CTkScrollableFrame(body, fg_color=("gray14", "gray10"), corner_radius=8)
+        left_col = ctk.CTkScrollableFrame(body, fg_color=("gray92", "gray14"), corner_radius=8)
         left_col.grid(row=0, column=0, sticky="nsew", padx=(0, SECTION_GAP), pady=0)
-        right_col = ctk.CTkScrollableFrame(body, fg_color=("gray14", "gray10"), corner_radius=8)
+        right_col = ctk.CTkScrollableFrame(body, fg_color=("gray92", "gray14"), corner_radius=8)
         right_col.grid(row=0, column=1, sticky="nsew", padx=(SECTION_GAP, 0), pady=0)
 
         def section_label(parent, text):
@@ -136,14 +136,14 @@ class NovaNotaView(ctk.CTkFrame):
         self._adhoc_preco = ctk.CTkEntry(adhoc, width=82, placeholder_text="Preço")
         attach_numeric_validation(self._adhoc_preco, "decimal")
         self._adhoc_preco.pack(side="left", padx=2)
-        self._btn_add_servico_adhoc = ctk.CTkButton(adhoc, text="+", width=38, font=ctk.CTkFont(weight="bold"), fg_color=("gray75", "gray30"), command=self._add_servico_adhoc)
+        self._btn_add_servico_adhoc = ctk.CTkButton(adhoc, text="+", width=38, font=ctk.CTkFont(weight="bold"), fg_color=("gray80", "gray30"), text_color=("gray10", "gray90"), hover_color=("gray70", "gray40"), command=self._add_servico_adhoc)
         self._btn_add_servico_adhoc.pack(side="left", padx=2)
 
         self._servicos_frame = ctk.CTkFrame(right_col, fg_color="transparent")
         self._servicos_frame.pack(fill="x", pady=(0, 0))
 
         # Rodapé fixo com pagamento, totais e ações
-        footer = ctk.CTkFrame(self, fg_color=("gray85", "gray15"), corner_radius=8)
+        footer = ctk.CTkFrame(self, fg_color=("gray88", "gray15"), corner_radius=8)
         footer.grid(row=2, column=0, sticky="ew", padx=PAGE_PADX, pady=(SECTION_GAP, PAGE_BOTTOM_PADY))
         footer.grid_columnconfigure(0, weight=1)
         footer.grid_columnconfigure(1, weight=1)
@@ -191,7 +191,7 @@ class NovaNotaView(ctk.CTkFrame):
         self._itens_editaveis = status in ("RASCUNHO", "ABERTA", "EM_ANDAMENTO")
 
         if status in ("RASCUNHO", "ABERTA", "EM_ANDAMENTO"):
-            ctk.CTkButton(self._btns, text="💾 Salvar Rascunho", width=150, fg_color=("gray75","gray30"), hover_color=("gray65","gray40"), command=self._salvar_rascunho).pack(side="left", padx=5)
+            ctk.CTkButton(self._btns, text="💾 Salvar Rascunho", width=150, fg_color=("gray80","gray30"), text_color=("gray10","gray90"), hover_color=("gray70","gray40"), command=self._salvar_rascunho).pack(side="left", padx=5)
             ctk.CTkButton(self._btns, text="✅ Concluir OS", width=150, fg_color="#34a853", hover_color="#2e7d32", command=self._concluir).pack(side="left", padx=5)
 
         if status == "CONCLUIDA":
@@ -201,7 +201,7 @@ class NovaNotaView(ctk.CTkFrame):
         if status in ("RASCUNHO", "ABERTA", "EM_ANDAMENTO", "CONCLUIDA"):
             ctk.CTkButton(self._btns, text="❌ Cancelar OS", width=140, fg_color="#ea4335", hover_color="#c62828", command=self._cancelar).pack(side="right", padx=5)
 
-        ctk.CTkButton(self._btns, text="← Voltar", width=100, fg_color=("gray75","gray30"), hover_color=("gray65","gray40"),
+        ctk.CTkButton(self._btns, text="← Voltar", width=100, fg_color=("gray80","gray30"), text_color=("gray10","gray90"), hover_color=("gray70","gray40"),
             command=lambda: self.app.show_view("notas")).pack(side="right", padx=5)
 
     def carregar_nota(self, nota_id: int | None = None, cliente_id: int | None = None) -> None:
@@ -413,7 +413,7 @@ class NovaNotaView(ctk.CTkFrame):
             ctk.CTkLabel(self._pecas_frame, text="Nenhuma peça adicionada ainda.", text_color="gray50").pack(anchor="w", pady=(0, 4))
 
         for i, p in enumerate(self._itens_pecas):
-            row = ctk.CTkFrame(self._pecas_frame, corner_radius=4)
+            row = ctk.CTkFrame(self._pecas_frame, fg_color=("white", "gray18"), corner_radius=6)
             row.pack(fill="x", pady=1)
             ctk.CTkLabel(row, text=p["descricao"], width=250, anchor="w").pack(side="left", padx=10, pady=4)
             ctk.CTkLabel(row, text=f"x{p['quantidade']}").pack(side="left", padx=5)
@@ -428,7 +428,7 @@ class NovaNotaView(ctk.CTkFrame):
             ctk.CTkLabel(self._servicos_frame, text="Nenhum serviço adicionado ainda.", text_color="gray50").pack(anchor="w", pady=(0, 4))
 
         for i, s in enumerate(self._itens_servicos):
-            row = ctk.CTkFrame(self._servicos_frame, corner_radius=4)
+            row = ctk.CTkFrame(self._servicos_frame, fg_color=("white", "gray18"), corner_radius=6)
             row.pack(fill="x", pady=1)
             ctk.CTkLabel(row, text=s["descricao"], width=300, anchor="w").pack(side="left", padx=10, pady=4)
             ctk.CTkLabel(row, text=f"R$ {s['valor']:.2f}", font=ctk.CTkFont(weight="bold")).pack(side="left", padx=5)

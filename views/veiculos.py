@@ -121,7 +121,7 @@ class VeiculosView(ctk.CTkFrame):
         ctk.CTkButton(btns, text="🗑️ Excluir", width=100, fg_color="#ea4335", hover_color="#c62828",
             command=lambda: ConfirmDialog(detail, "Excluir Veículo", "Tem certeza?",
                 on_confirm=lambda: (self.repos.veiculos.deletar(row["id"]), detail.destroy(), self._carregar())),
-        ).pack(side="right")
+        ).pack(side="left", padx=5)
 
         # Histórico OS
         ctk.CTkLabel(scroll, text="Histórico de OS", font=ctk.CTkFont(size=16, weight="bold")).pack(anchor="w", pady=(10, 5))
@@ -131,9 +131,9 @@ class VeiculosView(ctk.CTkFrame):
                 nf = ctk.CTkFrame(scroll, corner_radius=6)
                 nf.pack(fill="x", pady=2)
                 ctk.CTkLabel(nf, text=f"#{n['numero']}", font=ctk.CTkFont(weight="bold"), width=60).pack(side="left", padx=8, pady=6)
-                ctk.CTkLabel(nf, text=f"R$ {n['valor_total']:.2f}").pack(side="left", padx=5)
+                ctk.CTkLabel(nf, text=f"R$ {n['valor_total']:.2f}").pack(side="left", padx=15)
                 from components.cards import StatusBadge
-                StatusBadge(nf, n["status"]).pack(side="right", padx=8, pady=4)
+                StatusBadge(nf, n["status"]).pack(side="left", padx=15, pady=4)
             if not notas:
                 ctk.CTkLabel(scroll, text="Nenhuma OS.", text_color="gray50").pack(anchor="w")
         except Exception:
