@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 APP_NAME: str = "Gestão de Mecânica"
-APP_VERSION: str = "v1.0.1"
+APP_VERSION: str = "v1.0.2"
 
 # Nome estável usado em diretórios e instalador (sem acentos/espacos)
 APP_SLUG: str = "GestaoDeMecanica"

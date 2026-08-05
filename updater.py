@@ -85,10 +85,19 @@ def _obter_release_mais_recente() -> dict[str, object]:
     try:
         with urlopen(request, timeout=_REQUEST_TIMEOUT) as response:
             payload = json.loads(response.read().decode("utf-8"))
-    except (HTTPError, URLError, TimeoutError, json.JSONDecodeError, UnicodeDecodeError, OSError) as exc:
+    except HTTPError as exc:
+        if exc.code == 404:
+            # Repositório ainda não tem releases publicadas — não é um erro de rede.
+            raise UpdateError("__sem_releases__") from exc
         raise UpdateError(
-            "Não foi possível verificar atualizações no momento. Verifique sua conexão com a internet e tente novamente."
+            f"GitHub retornou erro {exc.code}. Verifique sua conexão e tente novamente."
         ) from exc
+    except (URLError, TimeoutError, OSError) as exc:
+        raise UpdateError(
+            "Não foi possível verificar atualizações. Verifique sua conexão com a internet."
+        ) from exc
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+        raise UpdateError("A resposta do servidor de atualização está inválida.") from exc
 
     if not isinstance(payload, dict):
         raise UpdateError("A resposta do GitHub para atualização é inválida.")
@@ -171,7 +180,10 @@ def verificar_atualizacao() -> ResultadoAtualizacao:
             }
 
         return _resultado_padrao()
-    except UpdateError:
+    except UpdateError as exc:
+        # Sem releases publicadas = sem atualização, não é um erro.
+        if "__sem_releases__" in str(exc):
+            return _resultado_padrao()
         return _resultado_padrao()
 
 
@@ -179,7 +191,14 @@ def obter_estado_atualizacao() -> UpdateStatus:
     """Retorna o estado detalhado da atualização para a interface."""
     try:
         payload = _obter_release_mais_recente()
-    except UpdateError:
+    except UpdateError as exc:
+        # Repositório sem releases publicadas ainda — tratar como "atualizado".
+        if "__sem_releases__" in str(exc):
+            return {
+                "estado": "atualizado",
+                "versao_nova": APP_VERSION,
+                "url_download": None,
+            }
         return {
             "estado": "erro",
             "versao_nova": None,
